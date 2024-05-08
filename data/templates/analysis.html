@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Sentiment Analysis</title>
+    <style>
+        body {
+            background-color: #f7f7f7;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 95%;
+            margin: auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex; /* Flexbox for layout */
+            flex-wrap: wrap; /* Allows wrapping */
+        }
+        .chart-column {
+            flex: 1; /* Each column takes equal space */
+            min-width: 300px; /* Minimum width before wrapping */
+        }
+        h1 {
+            font-size: calc(25px + 0.5vw);
+            margin-bottom: 0.5em;
+            text-align: center;
+            width: 100%; /* Full width to break to new line */
+        }
+        h2 {
+            font-size: calc(18px + 0.5vw);
+            margin-bottom: 1em;
+            text-align: center;
+            width: 100%; /* Full width to break to new line */
+        }
+        p, a {
+            margin-top: 1em;
+            font-size: calc(14px + 0.3vw);
+            text-align: center;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                flex-direction: column; /* Stack vertically on small screens */
+            }
+        }
+        .button:hover {
+            outline-color: transparent;
+            outline-style:solid;
+            box-shadow: 0 0 0 4px #A9A9A9;
+            transition: 0.7s;
+      }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Sentiment Analysis for {{ name }}</h1>
+
+        <div class="chart-column">
+            <div id="chart" style="width:100%; height:400px;"></div>
+            <div id="chart2" style="width:100%; height:400px;"></div>
+        </div>
+        <div class="chart-column">
+            <br><br><br><br><br>
+            <h2>10 Year Historical Backtesting</h2>
+                <p>Precision: {{ historical_information['precision'] }}</p>
+                <p>Recall: {{ historical_information['recall'] }}</p>
+                <p>F1 Score: {{ historical_information['f1'] }}</p>
+                <p>Accuracy: {{ historical_information['accuracy'] }}</p>
+            </td>
+            <br>
+            <h2>Pearson Correlation Coefficient</h2>
+                <p>{{correlation_coefficient}}</p>
+            <br>
+            <br>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="text-align: center;">
+                        {% if first_row_sentiment['sentiment_score'] > 0 %}
+                        <a href="https://www.tradingview.com/symbols/{{ticker}}/" style="text-decoration: none;">
+                            <button style="background-color: green; font-size: 28px; padding: 30px 60px;">BUY</button>
+                        </a>
+                        {% elif first_row_sentiment['sentiment_score'] == 0 %}
+                        <a href="https://www.tradingview.com/symbols/{{ticker}}/" style="text-decoration: none;">
+                            <button style="background-color: grey; font-size: 28px; padding: 30px 60px;">HOLD</button>
+                        </a>
+                        {% else %}
+                        <a href="https://www.tradingview.com/symbols/{{ticker}}/" style="text-decoration: none;">
+                            <button style="background-color: red; font-size: 28px; padding: 30px 60px;">SELL</button>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>The chart generated above presents the average sentiment scores alongside the live price of {{ name }} stock.
+            Below, a table lists the latest headlines related to the stock, complete with their respective sentiment scores.
+            These news headlines are sourced from the Mboum Finance API. Using the Pearson correlation coefficient in this
+            way allows analysts to statistically validate assumptions about how public sentiment affects market trends,
+            helping in the development of more informed trading strategies.</p>
+        <div>{{ table | safe }}</div>
+
+        <a href="/">Back</a>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script type="text/javascript">
+        var graph_hourly = {{ graph_sentiment | safe }};
+        Plotly.plot('chart', graph_hourly, {responsive: true});
+
+        var graph_price = {{ graph_price | safe }};
+        Plotly.newPlot('chart2', graph_price, {responsive: true});
+    </script>
+</body>
+</html>
