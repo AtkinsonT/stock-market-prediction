@@ -13,11 +13,12 @@ class API:
         pass
 
     def fetch_stock_data(symbol, interval):
-        querystring = {"symbol": symbol, "interval": interval, "diffandsplits": "false"}
-        response = requests.get(Config.HISTORY_API_URL, headers=Config.headers, params=querystring)
+        userinput = {"symbol": symbol, "interval": interval, "diffandsplits": "false"}
+        response = requests.get(Config.HISTORY_API_URL, headers=Config.headers, params=userinput)
         return response.json() if response.ok else None
 
-    def get_news(ticker):
+    def get_live_news(ticker):
+        # live and recent articles for the given stock ticker
         querystring = {"symbol": f"{ticker}"}
         response = requests.get(url=Config.NEWS_API_URL, headers=Config.headers, params=querystring)
         respose_json = response.json()
@@ -25,12 +26,14 @@ class API:
         if 'body' in respose_json:
             articles = respose_json['body']
             for article in articles:
-                utc_datetime = datetime.strptime(
-                    article['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
+                # parse publication date for better handling
+                utc_datetime = datetime.strptime(article['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
+                # data extraction
                 title_i = article['title']
                 description_i = article['description']
                 link_i = article['link']
                 data_array.append([utc_datetime, title_i, description_i, f'<a href="{link_i}">{title_i}</a>'])
+            # column names for df
             columns = ['Date Time', 'title', 'Description', 'title + link']
             df = pd.DataFrame(data_array, columns=columns)
             df['Date Time'] = pd.to_datetime(df['Date Time'], format=DATE_FORMAT, utc=True)
@@ -44,12 +47,14 @@ class API:
         return df
 
     def get_price_history(ticker: str, earliest_datetime: pd.Timestamp) -> pd.DataFrame:
+        # price history for given stock to the earliest date
         querystring = {"symbol": {ticker}, "interval": "1m", "diffandsplits": "false"}
         response = requests.get(url=Config.HISTORY_API_URL, headers=Config.headers, params=querystring)
         respose_json = response.json()
         price_history = respose_json['body']
         data_dict = []
         for stock_price in price_history.values():
+            # convert UNIX timestamp to datetime
             date_time_num = stock_price["date_utc"]
             utc_datetime = datetime.fromtimestamp(date_time_num, tz=pytz.utc)
             est_datetime = utc_datetime.astimezone(tz=BST)

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Sentiment Analysis</title>
+    <title>Predicting Stock Market Trends</title>
     <style>
         body {
             background-color: #f7f7f7;
@@ -62,7 +62,6 @@
             transition: 0.7s;
       }
     </style>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -88,11 +87,11 @@
             <table style="width: 100%;">
                 <tr>
                     <td style="text-align: center;">
-                        {% if first_row_sentiment['sentiment_score'] > 0 %}
+                        {% if first_row_sentiment['combined_sentiment_score'] > 30 %}
                         <a href="https://www.tradingview.com/symbols/{{ticker}}/" style="text-decoration: none;">
                             <button style="background-color: green; font-size: 28px; padding: 30px 60px;">BUY</button>
                         </a>
-                        {% elif first_row_sentiment['sentiment_score'] == 0 %}
+                        {% elif first_row_sentiment['combined_sentiment_score'] > -30 %}
                         <a href="https://www.tradingview.com/symbols/{{ticker}}/" style="text-decoration: none;">
                             <button style="background-color: grey; font-size: 28px; padding: 30px 60px;">HOLD</button>
                         </a>
@@ -105,14 +104,12 @@
                 </tr>
             </table>
         </div>
-
-        <p>The chart generated above presents the average sentiment scores alongside the live price of {{ name }} stock.
-            Below, a table lists the latest headlines related to the stock, complete with their respective sentiment scores.
-            These news headlines are sourced from the Mboum Finance API. Using the Pearson correlation coefficient in this
-            way allows analysts to statistically validate assumptions about how public sentiment affects market trends,
+        <p>The charts generated above presents the weighted sentiment scores alongside the live price of {{ name }} stock.
+            Below, a table lists the latest headlines related to the stock, complete with the respective Title, Description
+            and Overall sentiment scores.These headlines are sourced from the Mboum Finance API. Using the Pearson correlation
+            coefficient in this way allows analysts to validate assumptions about how news sentiment affects market trends,
             helping in the development of more informed trading strategies.</p>
         <div>{{ table | safe }}</div>
-
         <a href="/">Back</a>
     </div>
 
