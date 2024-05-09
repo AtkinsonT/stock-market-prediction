@@ -1,4 +1,4 @@
-class Config:
+class APIConfiguration:
     # URL for accessing news from API
     NEWS_API_URL = "https://mboum-finance.p.rapidapi.com/v1/markets/news"
 

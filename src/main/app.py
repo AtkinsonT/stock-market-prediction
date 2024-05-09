@@ -56,8 +56,8 @@ def get_earliest_date(df: pd.DataFrame) -> Any | None:
     return py_date.replace(tzinfo=BST)
 
 
-def plot_hourly_price(df, ticker) -> go.Figure:
-    # Plot hourly prices for a ticker using plotly
+def plot_price(df, ticker) -> go.Figure:
+    # Plot prices for a ticker using plotly
     if not {'Date Time', 'Price'}.issubset(df.columns):
         raise ValueError("DataFrame must contain 'Date Time' and 'Price' columns.")
 
@@ -116,6 +116,13 @@ def clean_interval_price(df):
     return df
 
 
+def headline_to_link(df: pd.DataFrame) -> pd.DataFrame:
+    # Transform headlines to clickable links
+    df.insert(2, 'Headline', df['title + link'])
+    df.drop(columns=['title + link', 'title'], inplace=True, axis=1)
+    return df
+
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('menu.html')
@@ -147,7 +154,7 @@ def analyze():
             cleaned_price_history_df[['Date Time', 'Price']]
         )
 
-        fig_line_price_history = plot_hourly_price(cleaned_price_history_df, ticker)
+        fig_line_price_history = plot_price(cleaned_price_history_df, ticker)
         graph_price = json.dumps(fig_line_price_history, cls=PlotlyJSONEncoder)
 
         scored_news_df = headline_to_link(scored_news_df)
@@ -166,13 +173,6 @@ def analyze():
         )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-def headline_to_link(df: pd.DataFrame) -> pd.DataFrame:
-    # Transform headlines to clickable links
-    df.insert(2, 'Headline', df['title + link'])
-    df.drop(columns=['title + link', 'title'], inplace=True, axis=1)
-    return df
 
 
 if __name__ == '__main__':

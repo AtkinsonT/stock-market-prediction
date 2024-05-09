@@ -1,6 +1,6 @@
 from datetime import datetime
 import requests
-from src.util.config import Config
+from src.util.apiconfiguration import APIConfiguration
 import pandas as pd
 import pytz
 
@@ -14,13 +14,13 @@ class API:
 
     def fetch_stock_data(symbol, interval):
         userinput = {"symbol": symbol, "interval": interval, "diffandsplits": "false"}
-        response = requests.get(Config.HISTORY_API_URL, headers=Config.headers, params=userinput)
+        response = requests.get(APIConfiguration.HISTORY_API_URL, headers=APIConfiguration.headers, params=userinput)
         return response.json() if response.ok else None
 
     def get_live_news(ticker):
         # live and recent articles for the given stock ticker
         querystring = {"symbol": f"{ticker}"}
-        response = requests.get(url=Config.NEWS_API_URL, headers=Config.headers, params=querystring)
+        response = requests.get(url=APIConfiguration.NEWS_API_URL, headers=APIConfiguration.headers, params=querystring)
         respose_json = response.json()
         data_array = []
         if 'body' in respose_json:
@@ -49,7 +49,7 @@ class API:
     def get_price_history(ticker: str, earliest_datetime: pd.Timestamp) -> pd.DataFrame:
         # price history for given stock to the earliest date
         querystring = {"symbol": {ticker}, "interval": "1m", "diffandsplits": "false"}
-        response = requests.get(url=Config.HISTORY_API_URL, headers=Config.headers, params=querystring)
+        response = requests.get(url=APIConfiguration.HISTORY_API_URL, headers=APIConfiguration.headers, params=querystring)
         respose_json = response.json()
         price_history = respose_json['body']
         data_dict = []
