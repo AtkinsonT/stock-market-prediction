@@ -8,15 +8,24 @@
     body { font-family: Arial, sans-serif; }
     .container { max-width: 600px; margin: auto; padding: 20px; }
     .title { text-align: center; }
-    .input { padding: 10px; margin: 10px 0; width: 100%; box-sizing: border-box; }
+    .input, .select { padding: 10px; margin: 10px 0; }
+    .input { width: calc(70% - 22px); box-sizing: border-box; } /* Adjusted width and box-sizing for inline display */
+    .select { width: calc(30% - 22px); } /* Width for the dropdown to fit inline */
     .button { padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    .form-row { display: flex; align-items: center; } /* Flex container for inline elements */
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="title">Predicting Stock Market Trends from News Headlines</h1>
     <form method="POST" action="analyze">
-      <input id="ticker" name="ticker" type="text" placeholder="Type stock ticker here" class="input">
+      <div class="form-row">
+        <input id="ticker" name="ticker" type="text" placeholder="Type stock ticker here" class="input">
+        <select name="analysis" class="select">
+          <option value="FinBERT">FinBERT</option>
+          <option value="VADER">VADER</option>
+        </select>
+      </div>
       <button type="submit" class="button">Predict the Market</button>
     </form>
   </div>

@@ -10,11 +10,12 @@ import yfinance as yf
 from flask import Flask, render_template, request, jsonify
 
 from sentiment.finbert import FinbertSentimentAnalysis
+from sentiment.vader import VaderSentimentAnalysis
 from src.historical.historical_backtesting import HistoricalPrediction
 from src.util.mboum_api import API
 
 BST = pytz.timezone('Europe/London')
-finbertSentimentAlgorithm = FinbertSentimentAnalysis()
+user_sentiment = FinbertSentimentAnalysis()
 
 app = Flask(__name__, template_folder="../../data/templates")
 
@@ -26,19 +27,19 @@ def get_live_price_history(ticker: str, earliest_datetime: pd.Timestamp) -> pd.D
 
 def get_news_articles(ticker) -> pd.DataFrame:
     # Fetch and return news articles for a specific ticker
-    finbertSentimentAlgorithm.set_symbol(ticker)
+    user_sentiment.set_symbol(ticker)
     return API.get_live_news(ticker)
 
 
 def score_news_sentiment(news_df: pd.DataFrame) -> pd.DataFrame:
     # Score the sentiment of news articles using Finbert model
-    finbertSentimentAlgorithm.set_data(news_df)
-    return finbertSentimentAlgorithm.calculate_sentiment_scores(news_df)
+    user_sentiment.set_data(news_df)
+    return user_sentiment.calculate_sentiment_scores(news_df)
 
 
 def plot_sentiment_scores(ticker: str) -> go.Figure:
     # Plot sentiment scores using plotly
-    return finbertSentimentAlgorithm.plot_sentiment()
+    return user_sentiment.plot_sentiment()
 
 
 def get_earliest_date(df: pd.DataFrame) -> Any | None:
@@ -130,12 +131,19 @@ def index():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
+    global user_sentiment
     # Main analysis endpoint to process requests
     try:
         ticker = request.form['ticker'].strip().upper()
+        inputted_sentiment = request.form['analysis']
         historical_information = evaluate_historical_accuracy(ticker)
         business_name = get_business_name(ticker)
         news_df = get_news_articles(ticker)
+
+        if inputted_sentiment == 'FinBERT':
+            user_sentiment = FinbertSentimentAnalysis()
+        elif inputted_sentiment == 'VADER':
+            user_sentiment = VaderSentimentAnalysis()
 
         if news_df.empty:
             return jsonify({"error": "No news articles found for the ticker."}), 404
