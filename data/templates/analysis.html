@@ -87,11 +87,11 @@
             <table style="width: 100%;">
                 <tr>
                     <td style="text-align: center;">
-                        {% if first_row_sentiment['combined_sentiment_score'] > 30 %}
+                        {% if first_row_sentiment['combined_sentiment_score'] > 0 %}
                         <a href="https://www.tradingview.com/symbols/{{ticker}}/" style="text-decoration: none;">
                             <button style="background-color: green; font-size: 28px; padding: 30px 60px;">BUY</button>
                         </a>
-                        {% elif first_row_sentiment['combined_sentiment_score'] > -30 %}
+                        {% elif first_row_sentiment['combined_sentiment_score'] == 0 %}
                         <a href="https://www.tradingview.com/symbols/{{ticker}}/" style="text-decoration: none;">
                             <button style="background-color: grey; font-size: 28px; padding: 30px 60px;">HOLD</button>
                         </a>

@@ -30,7 +30,7 @@ class HistoricalPrediction:
         data = nasdaq.history(period="10y")  # Use 10 years of data
         self.calculate_macd(data)
         self.calculate_rsi(data)
-        data['Previous Close'] = data['Close'].shift(1)  # yesterdays close price
+        data['Previous Close'] = data['Close'].shift(1)  # yesterday's close price
         data.dropna(inplace=True)
         return data
 
