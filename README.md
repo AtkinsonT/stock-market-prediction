@@ -10,6 +10,6 @@ During development, I faced challenges: Dealing with unstructured text data and 
 To get this project running on your local machine, follow these steps:
 
 pip install -r requirements.txt
-python main.py
+python app.py
 
 Tomos Atkinson
